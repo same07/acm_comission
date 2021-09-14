@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use DB;
+use Log;
 
 class Mebuy
 {
@@ -156,13 +157,14 @@ class Mebuy
 
     private function getOrder()
     {
-        return  DB::table('meshop_pos_orders')
+        $data = DB::table('meshop_pos_orders')
             ->join('meshop_pos_order_status_logs', 'meshop_pos_orders.id', '=', 'meshop_pos_order_status_logs.meshop_pos_order_id')
             ->where('meshop_pos_orders.id', $this->getOrderId())
             ->where('meshop_pos_orders.user_id', $this->getCustomerId())
             ->where('meshop_pos_order_status_logs.order_status_id', self::STATUS_SELESAI_ID)
             ->select('meshop_pos_orders.*')
             ->first();
+        return $data;
     }
 
     private function getUserIdByType($type)
@@ -224,7 +226,7 @@ class Mebuy
             ->first();
 
         if (!$user_wallet) {
-            $user_wallet = DB::table('user_wallet')
+            $user_wallet = DB::table('user_wallets')
                 ->insertGetId(
                     [
                         'wallet_id' => $wallet->id,
@@ -247,7 +249,7 @@ class Mebuy
             $user_id = $this->getUserIdByType($type);
             $data = DB::table('user_wallet_logs')
                 ->where('user_id', $user_id)
-                ->where('reference_id', $this->getOrder())
+                ->where('reference_id', $this->getOrderId())
                 ->where('reference_table', self::REFERENCE_TABLE)
                 ->where('user_wallet_id', $user_wallet->id)
                 ->first();
@@ -255,7 +257,6 @@ class Mebuy
             return $data;
 
         } catch (Exception $e) {
-            // throw new Exception($e->getMessage());
             return null;
         }
     }
@@ -270,6 +271,7 @@ class Mebuy
         $user_wallet = $this->getWallet($type);
         $user_id = $this->getUserIdByType($type);
         $comission = $this->getComissionByType($type);
+        
         try {
 
             DB::table('user_wallet_logs')
@@ -359,7 +361,7 @@ class Mebuy
             /**
              * Komisi Customer
              */
-            if ($this->isComissionInserted(self::CUSTOMER_VALUE)) {
+            if (!$this->isComissionInserted(self::CUSTOMER_VALUE)) {
                 $this->insertComission(self::CUSTOMER_VALUE, $comission_cust);
             }
 
@@ -367,7 +369,7 @@ class Mebuy
                 /**
                  * Komisi Dropshipper
                  */
-                if ($this->isComissionInserted(self::DROPSHIPPER_VALUE)) {
+                if (!$this->isComissionInserted(self::DROPSHIPPER_VALUE)) {
                     $this->insertComission(self::DROPSHIPPER_VALUE, $comission_dropshipper);
                 }
 
@@ -376,7 +378,7 @@ class Mebuy
                     /**
                      * Komisi SHM
                      */
-                    if ($this->isComissionInserted(self::SHM_VALUE)) {
+                    if (!$this->isComissionInserted(self::SHM_VALUE)) {
                         $this->insertComission(self::SHM_VALUE, $comission_shm);
                     }
 
@@ -385,7 +387,7 @@ class Mebuy
                          * Komisi Upline
                          */
                         $this->setUplineId($affiliator->user_enterpreneur_id);
-                        if ($this->isComissionInserted(self::DS_GET_DS_VALUE)) {
+                        if (!$this->isComissionInserted(self::DS_GET_DS_VALUE)) {
                             $this->insertComission(self::DS_GET_DS_VALUE, $comission_ds_get_ds);
                         }
                     }
@@ -395,7 +397,6 @@ class Mebuy
             
 
         } catch (Exception $e) {
-            // throw new Exception($e->getMessage());
         }
     }
 
