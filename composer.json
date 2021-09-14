@@ -1,0 +1,24 @@
+{
+    "name": "memiles/comission",
+    "description": "Memiles Comission Library",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Memiles\\Comission\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "SamuelHermawan",
+            "email": "samuelhermawan07@gmail.com"
+        }
+    ],
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Memiles\\Comission\\Providers\\MemilesComissionProvider"
+            ]
+        }
+    }
+}
