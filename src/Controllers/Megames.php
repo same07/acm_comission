@@ -7,7 +7,7 @@ use Exception;
 use Illuminate\Http\Request;
 use DB;
 
-class MebuyController
+class Megames
 {
     
     const DROPSHIPPER = 25;
