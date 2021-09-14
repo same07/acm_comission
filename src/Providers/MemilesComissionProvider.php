@@ -24,7 +24,7 @@ class MemilesComissionProvider extends ServiceProvider
     public function boot()
     {
         //
-        $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->loadRoutesFrom(__DIR__.'/../routes.php');
         $this->publishes([
             __DIR__.'/../resources/config/memiles_comission.php' => config_path('memiles_comission.php'),
         ]);
