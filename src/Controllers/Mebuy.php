@@ -15,6 +15,8 @@ class Mebuy
     const CUST = 1;
     const SHM = 0.5;
     const DSGETDS = 0.5;
+    const EXECUTIVE = 0.5;
+    const PERCEPATAN = 2;
     const STATUS_SELESAI_ID = 5;
     const REFERENCE_TABLE = 'meshop_pos_orders';
     const WALLET_DROPSHIPPER = 'mebuy_dropshipper';
@@ -23,18 +25,36 @@ class Mebuy
     const WALLET_DS_ROYALTY = 'mebuy_dropshipper_royalty';
 
     const CUSTOMER_VALUE = 'customer';
+    const EXECUTIVE_VALUE = 'executive';
     const DROPSHIPPER_VALUE = 'dropshipper';
     const SHM_VALUE = 'shm';
     const DS_GET_DS_VALUE = 'ds_get_ds';
 
-    protected $com_dropshipper, $com_cust, $com_shm, $com_dsgetds, $customer_id, $order_id, $shm_id, $dropshipper_id, $upline_id;
+    protected 
+        $com_dropshipper, 
+        $com_cust, 
+        $com_shm,
+        $com_executive,
+        $com_dsgetds, 
+        $customer_id, 
+        $order_id, 
+        $shm_id, 
+        $dropshipper_id, 
+        $upline_id, 
+        $executive_marketing_id;
 
-    public function __construct($dropshipper = self::DROPSHIPPER, $cust = self::CUST, $shm = self::SHM, $dsgetds = 0.5)
-    {
+    public function __construct(
+        $dropshipper = self::DROPSHIPPER, 
+        $cust = self::CUST, 
+        $shm = self::SHM,
+        $executive = self::EXECUTIVE,
+        $dsgetds = self::DSGETDS
+    ) {
         $this->com_dropshipper = $dropshipper;
         $this->com_cust = $cust;
         $this->com_shm = $shm;
         $this->com_dsgetds = $dsgetds;
+        $this->com_executive = $executive;
     }
 
     /**
@@ -90,6 +110,11 @@ class Mebuy
         return $this->com_dropshipper/100;
     }
 
+    private function getPercentageExe()
+    {
+        return $this->com_executive/100;
+    }
+
     private function getPercentageCust()
     {
         return $this->com_cust/100;
@@ -130,6 +155,15 @@ class Mebuy
         $this->upline_id = $value;
     }
 
+    private function setExecutiveId($value)
+    {
+        $this->executive_marketing_id = $value;
+    }
+
+    private function getExecutiveId()
+    {
+        return $this->executive_marketing_id;
+    }
     private function getOrderId()
     {
         return $this->order_id;
@@ -177,6 +211,8 @@ class Mebuy
             $user_id = $this->getShmId();
         } else if ($type == self::DS_GET_DS_VALUE) {
             $user_id = $this->getUplineId();
+        } else if ($type == self::EXECUTIVE_VALUE) {
+            $user_id = $this->getExecutiveId();
         }
         return $user_id;
     }
@@ -206,6 +242,8 @@ class Mebuy
             $data = $this->getPercentageShm();
         } else if ($type == self::DS_GET_DS_VALUE) {
             $data = $this->getPercentageDsGetDs();
+        } else if ($type == self::EXECUTIVE_VALUE) {
+            $data = $this->getPercentageExe();
         }
         return $data;
     }
@@ -318,10 +356,6 @@ class Mebuy
 
     }
 
-    private function isEnterpreneurIsNotSHM($affiliator)
-    {
-        return $affiliator->user_executive_marketing_id != $affiliator->user_enterpreneur_id;
-    }
 
     /**
      * Share Comission
@@ -352,7 +386,8 @@ class Mebuy
                 $this->setDropshipperId($vendor->user_id);
             }
 
-            $comission_dropshipper = $this->getPercentageDropshipper() * $order->grand_total;
+            // $comission_dropshipper = $this->getPercentageDropshipper() * $order->grand_total;
+            $comission_dropshipper = $order->komisi_amount;
             $comission_cust = $this->getPercentageCust() * $order->grand_total;
             $comission_shm = $this->getPercentageShm() * $order->grand_total;
             $comission_ds_get_ds = $this->getPercentageDsGetDs() * $order->grand_total;
@@ -374,7 +409,16 @@ class Mebuy
                 }
 
                 if ($affiliator = $this->getAffiliator()) {
-                    $this->setShmId($affiliator->user_executive_marketing_id);
+
+                    /**
+                     * Komisi Upline
+                     */
+                    $this->setUplineId($affiliator->user_enterpreneur_id);
+                    if (!$this->isComissionInserted(self::DS_GET_DS_VALUE)) {
+                        $this->insertComission(self::DS_GET_DS_VALUE, $comission_ds_get_ds);
+                    }
+
+                    $this->setShmId($affiliator->user_head_marketing_id);
                     /**
                      * Komisi SHM
                      */
@@ -382,15 +426,15 @@ class Mebuy
                         $this->insertComission(self::SHM_VALUE, $comission_shm);
                     }
 
-                    if ($this->isEnterpreneurIsNotSHM($affiliator)) {
-                        /**
-                         * Komisi Upline
-                         */
-                        $this->setUplineId($affiliator->user_enterpreneur_id);
-                        if (!$this->isComissionInserted(self::DS_GET_DS_VALUE)) {
-                            $this->insertComission(self::DS_GET_DS_VALUE, $comission_ds_get_ds);
-                        }
+                    $this->setExecutiveId($affiliator->user_executive_marketing_id);
+                    /**
+                     * Komisi Executive
+                     */
+                    if (!$this->isComissionInserted(self::EXECUTIVE_VALUE)) {
+                        $this->insertComission(self::EXECUTIVE_VALUE, $comission_shm);
                     }
+
+                        
                 }
 
             }
@@ -399,5 +443,7 @@ class Mebuy
         } catch (Exception $e) {
         }
     }
+
+
 
 }
