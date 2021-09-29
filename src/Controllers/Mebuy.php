@@ -18,6 +18,7 @@ class Mebuy
     const EXECUTIVE = 0.5;
     const PERCEPATAN = 2;
     const STATUS_SELESAI_ID = 5;
+    const STATUS_SELESAI_SLUG = 'selesai';
     const REFERENCE_TABLE = 'meshop_pos_orders';
     const WALLET_DROPSHIPPER = 'mebuy_dropshipper';
     const WALLET_GOLD = 'mebuy_gold';
@@ -193,9 +194,10 @@ class Mebuy
     {
         $data = DB::table('meshop_pos_orders')
             ->join('meshop_pos_order_status_logs', 'meshop_pos_orders.id', '=', 'meshop_pos_order_status_logs.meshop_pos_order_id')
+            ->join('order_status', 'meshop_pos_orders.order_status_id', '=', 'order_status.id')
             ->where('meshop_pos_orders.id', $this->getOrderId())
             ->where('meshop_pos_orders.user_id', $this->getCustomerId())
-            ->where('meshop_pos_order_status_logs.order_status_id', self::STATUS_SELESAI_ID)
+            ->where('order_status.slug', self::STATUS_SELESAI_SLUG)
             ->select('meshop_pos_orders.*')
             ->first();
         return $data;
