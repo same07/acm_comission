@@ -11,7 +11,7 @@ use Log;
 class Mebuy
 {
     
-    const DROPSHIPPER = 25;
+    const DROPSHIPPER = 40;
     const CUST = 1;
     const SHM = 0.5;
     const DSGETDS = 0.5;
@@ -332,7 +332,7 @@ class Mebuy
                         'after' => $user_wallet->amount + $amount,
                         'reference_id' => $this->getOrderId(),
                         'reference_table' => self::REFERENCE_TABLE,
-                        'comission' => $comission,
+                        'comission' => $comission * 100,
                         'remarks' => 'Anda mendapatkan komisi sebesar : ' . number_format($amount, 0)
                     ]
                 );
