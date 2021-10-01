@@ -24,6 +24,7 @@ class Mebuy
     const WALLET_GOLD = 'mebuy_gold';
     const WALLET_SHM = 'mebuy_shm';
     const WALLET_DS_ROYALTY = 'mebuy_dropshipper_royalty';
+    const WALLET_EXECUTIVE = 'mebuy_executive';
 
     const CUSTOMER_VALUE = 'customer';
     const EXECUTIVE_VALUE = 'executive';
@@ -229,6 +230,8 @@ class Mebuy
             $wallet_id = self::WALLET_SHM;
         } else if ($type == self::DS_GET_DS_VALUE) {
             $wallet_id = self::WALLET_DS_ROYALTY;
+        } else if ($type == self::EXECUTIVE_VALUE) {
+            $wallet_id = self::WALLET_EXECUTIVE;
         }
         return $wallet_id;
     }
@@ -392,6 +395,7 @@ class Mebuy
             $comission_dropshipper = $order->komisi_amount;
             $comission_cust = $this->getPercentageCust() * $order->grand_total;
             $comission_shm = $this->getPercentageShm() * $order->grand_total;
+            $comission_exe = $this->getPercentageExe() * $order->grand_total;
             $comission_ds_get_ds = $this->getPercentageDsGetDs() * $order->grand_total;
 
 
@@ -433,7 +437,7 @@ class Mebuy
                      * Komisi Executive
                      */
                     if (!$this->isComissionInserted(self::EXECUTIVE_VALUE)) {
-                        $this->insertComission(self::EXECUTIVE_VALUE, $comission_shm);
+                        $this->insertComission(self::EXECUTIVE_VALUE, $comission_exe);
                     }
 
                         
