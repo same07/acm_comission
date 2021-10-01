@@ -393,7 +393,7 @@ class Mebuy
 
             // $comission_dropshipper = $this->getPercentageDropshipper() * $order->grand_total;
             $comission_dropshipper = $order->komisi_amount;
-            $comission_cust = $this->getPercentageCust() * $order->grand_total;
+            // $comission_cust = $this->getPercentageCust() * $order->grand_total;
             $comission_shm = $this->getPercentageShm() * $order->grand_total;
             $comission_exe = $this->getPercentageExe() * $order->grand_total;
             $comission_ds_get_ds = $this->getPercentageDsGetDs() * $order->grand_total;
@@ -402,9 +402,9 @@ class Mebuy
             /**
              * Komisi Customer
              */
-            if (!$this->isComissionInserted(self::CUSTOMER_VALUE)) {
-                $this->insertComission(self::CUSTOMER_VALUE, $comission_cust);
-            }
+            // if (!$this->isComissionInserted(self::CUSTOMER_VALUE)) {
+            //     $this->insertComission(self::CUSTOMER_VALUE, $comission_cust);
+            // }
 
             if ($this->getDropshipperId()) {
                 /**
