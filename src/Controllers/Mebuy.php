@@ -429,7 +429,7 @@ class Mebuy
                      * Komisi SHM
                      */
                     if (!$this->isComissionInserted(self::SHM_VALUE)) {
-                        $this->insertComission(self::SHM_VALUE, $comission_shm);
+                        // $this->insertComission(self::SHM_VALUE, $comission_shm);
                     }
 
                     $this->setExecutiveId($affiliator->user_executive_marketing_id);
