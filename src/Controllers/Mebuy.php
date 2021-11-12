@@ -53,10 +53,10 @@ class Mebuy
         $dsgetds = self::DSGETDS
     ) {
         $this->com_dropshipper = $dropshipper;
-        $this->com_cust = $cust;
-        $this->com_shm = $shm;
-        $this->com_dsgetds = $dsgetds;
-        $this->com_executive = $executive;
+        $this->com_cust = 0;
+        $this->com_shm = 0;
+        $this->com_dsgetds = 0;
+        $this->com_executive = 0;
     }
 
     /**
